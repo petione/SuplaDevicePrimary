@@ -37,13 +37,13 @@
 #endif
 
 #define SRPC_BUFFER_SIZE 1024
-#define SRPC_QUEUE_SIZE 2
+#define SRPC_QUEUE_SIZE 4
 #define SRPC_QUEUE_MIN_ALLOC_COUNT 2
 
 #elif defined(__AVR__)
 
 #define SRPC_BUFFER_SIZE 1024
-#define SRPC_QUEUE_SIZE 2
+#define SRPC_QUEUE_SIZE 4
 #define SRPC_QUEUE_MIN_ALLOC_COUNT 2
 #define __EH_DISABLED
 
