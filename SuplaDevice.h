@@ -20,6 +20,12 @@
 #include "proto.h"
 #include <IPAddress.h>
 
+#define INPUT_TYPE_BTN_BISTABLE			0 
+#define INPUT_TYPE_BTN_MONOSTABLE		1 
+
+#define RELAY_FLAG_RESET				0
+#define RELAY_FLAG_RESTORE				1
+
 #define ACTIVITY_TIMEOUT 30
 
 #define STATUS_ALREADY_INITIALIZED     2
@@ -47,6 +53,8 @@ typedef void (*_cb_arduino_eth_setup)(uint8_t mac[6], IPAddress *ip);
 typedef bool (*_cb_arduino_connect)(const char *server, _supla_int_t port);
 typedef bool (*_cb_arduino_connected)(void);
 typedef void (*_cb_arduino_stop)(void);
+typedef void (*_cb_arduino_set_relay_state)(int channelNumber, String state);
+typedef int (*_cb_arduino_get_relay_state)(int channelNumber);
 typedef double (*_cb_arduino_get_double)(int channelNumber, double current_value);
 typedef void (*_cb_arduino_get_temperature_and_humidity)(int channelNumber, double *temp, double *humidity);
 typedef void (*_cb_arduino_get_rgbw_value)(int channelNumber, unsigned char *red, unsigned char *green, unsigned char *blue, unsigned char *color_brightness, unsigned char *brightness);
@@ -79,6 +87,8 @@ typedef struct SuplaDeviceCallbacks {
 	_cb_arduino_get_rgbw_value get_rgbw_value;
 	_cb_arduino_set_rgbw_value set_rgbw_value;
 	_cb_arduino_get_double get_distance;
+	_cb_arduino_set_relay_state save_supla_relay_state;
+	_cb_arduino_get_relay_state read_supla_relay_state;
 
 }SuplaDeviceCallbacks;
 
@@ -98,6 +108,9 @@ typedef struct SuplaChannelPin {
 	int pin2;
 	bool hiIsLo;
 	bool bistable;
+	int type;
+	int start;
+	int flag;
 	
 	unsigned long time_left;
 	unsigned long bi_time_left;
@@ -166,12 +179,12 @@ protected:
 	char registered;
 	bool isInitialized(bool msg);
 	void setString(char *dst, const char *src, int max_size);
-	int addChannel(int pin1, int pin2, bool hiIsLo, bool bistable);
+	int addChannel(int pin1, int pin2, bool hiIsLo, bool bistable, int type = NULL, int flag = NULL);
 	void channelValueChanged(int channel_number, char v, double d, char var);
 	void channelSetValue(int channel, char value, _supla_int_t DurationMS);
 	void channelSetDoubleValue(int channelNum, double value);
 	void setDoubleValue(char value[SUPLA_CHANNELVALUE_SIZE], double v);
-	bool addDHT(int Type);
+	int addDHT(int Type);
 	void channelSetTempAndHumidityValue(int channelNum, double temp, double humidity);
 	void setRGBWvalue(int channelNum, char value[SUPLA_CHANNELVALUE_SIZE]);
 	void channelSetRGBWvalue(int channel, char value[SUPLA_CHANNELVALUE_SIZE]);
@@ -220,6 +233,7 @@ protected:
     void iterate_sensor(SuplaChannelPin *pin, TDS_SuplaDeviceChannel_B *channel, unsigned long time_diff, int channel_idx);
     void iterate_thermometer(SuplaChannelPin *pin, TDS_SuplaDeviceChannel_B *channel, unsigned long time_diff, int channel_idx);
     void iterate_rollershutter(SuplaDeviceRollerShutter *rs, SuplaChannelPin *pin, TDS_SuplaDeviceChannel_B *channel);
+	void iterate_relaybutton(SuplaChannelPin *pin, TDS_SuplaDeviceChannel_B *channel, unsigned long time_diff, int channel_idx);
     
     void begin_thermometer(SuplaChannelPin *pin, TDS_SuplaDeviceChannel_B *channel, int channel_number);
     
@@ -253,10 +267,15 @@ public:
    void setRollerShutterButtons(int channel_number, int btnUpPin, int btnDownPin);
    bool addSensorNO(int sensorPin, bool pullUp);
    bool addSensorNO(int sensorPin);
-   bool addDS18B20Thermometer(void);
-   bool addDHT11(void);
-   bool addDHT22(void);
-   bool addAM2302(void);
+   
+   int addRelayButton(int relayPin1, int relayPin2, int type_button, int flag, bool hiIsLo, _supla_int_t functions);
+   bool addRelayButton(int relayPin, int relayPin2, int type_button, int flag, bool hiIsLo);
+   bool addRelayButton(int relayPin, int relayPin2, int type_button, int flag);
+   
+   int addDS18B20Thermometer();
+   int addDHT11();
+   int addDHT22();
+   int addAM2302();
    bool addRgbControllerAndDimmer(void);
    bool addRgbController(void);
    bool addDimmer(void);
@@ -268,7 +287,8 @@ public:
     
    bool relayOn(int channel_number, _supla_int_t DurationMS);
    bool relayOff(int channel_number);
-    
+   bool relaySwitch(int channel_number, int relay);
+   
    void rollerShutterReveal(int channel_number);
    void rollerShutterShut(int channel_number);
    void rollerShutterStop(int channel_number);
@@ -278,6 +298,8 @@ public:
    void iterate(void);
    
    SuplaDeviceCallbacks getCallbacks(void);
+   void setSaveRelayStateCallback(_cb_arduino_set_relay_state save_supla_relay_state);
+   void setReadRelayStateCallback(_cb_arduino_get_relay_state read_supla_relay_state);
    void setTemperatureCallback(_cb_arduino_get_double get_temperature);
    void setTemperatureHumidityCallback(_cb_arduino_get_temperature_and_humidity get_temperature_and_humidity);
    void setRGBWCallbacks(_cb_arduino_get_rgbw_value get_rgbw_value, _cb_arduino_set_rgbw_value set_rgbw_value);
@@ -311,4 +333,8 @@ public:
 			
 extern SuplaDeviceClass SuplaDevice;
 extern SuplaDeviceCallbacks supla_arduino_get_callbacks(void);
+
+void supla_ds18b20_channel_pin(int channel, int pin);
+void supla_dht_channel_pin(int channel, int pin, int type);
+
 #endif
