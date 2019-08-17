@@ -873,6 +873,7 @@ void SuplaDeviceClass::iterate_relay(SuplaChannelPin *pin, TDS_SuplaDeviceChanne
         }
         
     }
+}
 
 void SuplaDeviceClass::iterate_relaybutton(SuplaChannelPin *pin, TDS_SuplaDeviceChannel_B *channel, unsigned long time_diff, int channel_number) {	
 	
