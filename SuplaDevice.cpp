@@ -889,7 +889,8 @@ void SuplaDeviceClass::iterate_relaybutton(SuplaChannelPin *pin, TDS_SuplaDevice
 				 }
 				 else {
 					uint8_t val1 = suplaDigitalRead(channel->Number, pin->pin1);
-					channelValueChanged(channel->Number, val1 == HIGH ? 1 : 0);	
+					//channelValueChanged(channel->Number, val1 == HIGH ? 1 : 0);	
+					channelSetValue(channel->Number, val1 == HIGH ? 1 : 0, 0);
 				 }
 				pin->start = 1;	
 				
@@ -1458,6 +1459,14 @@ void SuplaDeviceClass::iterate(void) {
     int a;
     unsigned long _millis = millis();
     unsigned long time_diff = abs(_millis - last_iterate_time);
+	if ( !Params.cb.svr_connected() ) {
+		if ( time_diff > 0 ) {
+			for(a=0;a<Params.reg_dev.channel_count;a++) {
+				iterate_relaybutton(&channel_pin[a], &Params.reg_dev.channels[a], time_diff, a);  
+			}
+			last_iterate_time = millis();
+		}
+	}
     
     if ( wait_for_iterate != 0
          && _millis < wait_for_iterate ) {
@@ -1483,7 +1492,7 @@ void SuplaDeviceClass::iterate(void) {
 		    	supla_log(LOG_DEBUG, "Connection fail. Server: %s", Params.reg_dev.ServerName);
 		    	Params.cb.svr_disconnect();
 
-                wait_for_iterate = millis() + 2000;
+                wait_for_iterate = millis() + 5000;
 				return;
 		}
 
