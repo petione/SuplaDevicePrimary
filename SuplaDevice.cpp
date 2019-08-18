@@ -895,22 +895,25 @@ void SuplaDeviceClass::iterate_relaybutton(SuplaChannelPin *pin, TDS_SuplaDevice
 				 }
 				pin->start = 1;	
 				
-			 }	 
-			 else if(val == 1 && val != pin->last_val){		
+			 } else {
+				if ( val != pin->last_val && millis()-pin->time_left >= 50 ) {
+					if(val == 1 && val != pin->last_val){		
 			 
-				relaySwitch(channel->Number, pin->pin1);	
+						relaySwitch(channel->Number, pin->pin1);	
 							
-			 }
-			 else if (val == 0 && val != pin->last_val){
+					}
+					else if (val == 0 && val != pin->last_val){
 			 
-				if(pin->type == INPUT_TYPE_BTN_BISTABLE){
+						if(pin->type == INPUT_TYPE_BTN_BISTABLE){
 				
-				 relaySwitch(channel->Number, pin->pin1);
+						relaySwitch(channel->Number, pin->pin1);
 								
-				}			
-			 }	
-			 
-		pin->last_val = val;	 
+						}			
+					}	
+				pin->time_left = millis();
+				pin->last_val = val;
+			}
+		}		
 	}		
 }
 
