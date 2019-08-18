@@ -713,7 +713,7 @@ bool SuplaDeviceClass::addPressureSensor(void) {
     if ( c == -1 ) return false; 
 	
     Params.reg_dev.channels[c].Type = SUPLA_CHANNELTYPE_PRESSURESENSOR;
-    channel_pin[c].last_val_dbl1 = -275;
+    channel_pin[c].last_val_dbl1 = -1;
     channelSetDoubleValue(c, channel_pin[c].last_val_dbl1);
     
 }
@@ -724,7 +724,7 @@ bool SuplaDeviceClass::addWeightSensor(void) {
     if ( c == -1 ) return false; 
 	
     Params.reg_dev.channels[c].Type = SUPLA_CHANNELTYPE_WEIGHTSENSOR;
-    channel_pin[c].last_val_dbl1 = -275;
+    channel_pin[c].last_val_dbl1 = -1;
     channelSetDoubleValue(c, channel_pin[c].last_val_dbl1);
     
 }
@@ -735,7 +735,7 @@ bool SuplaDeviceClass::addWindSensor(void) {
     if ( c == -1 ) return false; 
 	
     Params.reg_dev.channels[c].Type = SUPLA_CHANNELTYPE_WINDSENSOR;
-    channel_pin[c].last_val_dbl1 = -275;
+    channel_pin[c].last_val_dbl1 = -1;
     channelSetDoubleValue(c, channel_pin[c].last_val_dbl1);
     
 }
@@ -746,7 +746,7 @@ bool SuplaDeviceClass::addRainSensor(void) {
     if ( c == -1 ) return false; 
 	
     Params.reg_dev.channels[c].Type = SUPLA_CHANNELTYPE_RAINSENSOR;
-    channel_pin[c].last_val_dbl1 = -275;
+    channel_pin[c].last_val_dbl1 = -1;
     channelSetDoubleValue(c, channel_pin[c].last_val_dbl1);
     
 }
