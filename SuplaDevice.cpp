@@ -893,6 +893,7 @@ void SuplaDeviceClass::iterate_relaybutton(SuplaChannelPin *pin, TDS_SuplaDevice
 					//channelValueChanged(channel->Number, val1 == HIGH ? 1 : 0);	
 					channelSetValue(channel->Number, val1 == HIGH ? 1 : 0, 0);
 				 }
+				pin->time_left = millis();
 				pin->start = 1;	
 				
 			 } else {
