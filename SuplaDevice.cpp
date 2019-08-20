@@ -898,12 +898,12 @@ void SuplaDeviceClass::iterate_relaybutton(SuplaChannelPin *pin, TDS_SuplaDevice
 				
 			 } else {
 				if ( val != pin->last_val && millis()-pin->time_left >= 50 ) {
-					if(val == 1){		
+					if(val == 0){		
 			 
 						relaySwitch(channel->Number, pin->pin1);	
 							
 					}
-					else if (val == 0){
+					else if (val == 1){
 			 
 						if(pin->type == INPUT_TYPE_BTN_BISTABLE){
 				
