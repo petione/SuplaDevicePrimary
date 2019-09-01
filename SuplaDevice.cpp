@@ -422,6 +422,7 @@ int SuplaDeviceClass::addChannel(int pin1, int pin2, bool hiIsLo, bool bistable,
 	channel_pin[Params.reg_dev.channel_count].type = type;
 	channel_pin[Params.reg_dev.channel_count].start = 0;
 	channel_pin[Params.reg_dev.channel_count].flag = flag;
+	channel_pin[Params.reg_dev.channel_count].btn_next_check = 0;
 	
 	Params.reg_dev.channel_count++;
 	
@@ -446,7 +447,7 @@ int SuplaDeviceClass::addRelayButton(int relayPin, int buttonPin, int type_butto
 		Params.reg_dev.channels[c].value[0] = suplaDigitalRead(Params.reg_dev.channels[c].Number, relayPin) == _HI ? 1 : 0;
 	}
 
-	if ( buttonPin >= 0 )
+	if ( buttonPin > 0 )
 	 		  
 		  pinMode(buttonPin, INPUT_PULLUP); 
 		  //Params.reg_dev.channels[c].value[0] = suplaDigitalRead(Params.reg_dev.channels[c].Number, buttonPin) == HIGH ? 1 : 0;	
@@ -883,6 +884,7 @@ void SuplaDeviceClass::iterate_relaybutton(SuplaChannelPin *pin, TDS_SuplaDevice
 				 if ( pin->flag == RELAY_FLAG_RESTORE && Params.cb.read_supla_relay_state != 0) {
 					int state = Params.cb.read_supla_relay_state(channel->Number);
 					channelSetValue(channel->Number, state, 0);
+					//channelValueChanged(channel->Number, state == HIGH ? 1 : 0);	
 					//Serial.print("channel->Number-"); Serial.print(channel->Number); Serial.print("=="); Serial.println(state); 
 				 }
 				 else {
@@ -890,14 +892,14 @@ void SuplaDeviceClass::iterate_relaybutton(SuplaChannelPin *pin, TDS_SuplaDevice
 					//channelValueChanged(channel->Number, val1 == HIGH ? 1 : 0);	
 					channelSetValue(channel->Number, val1 == HIGH ? 1 : 0, 0);
 				 }
-				//pin->time_left = millis();
+				pin->btn_next_check = millis();
 				pin->start = 1;	
 				
 			 } else {
 				
 				uint8_t val = suplaDigitalRead(channel->Number, pin->pin2);
 				
-				if ( val != pin->last_val && millis()-pin->time_left >= 100 ) {
+				if ( val != pin->last_val && millis()-pin->btn_next_check >= 100 ) {
 					if(val == 0){		
 			 
 						relaySwitch(channel->Number, pin->pin1);	
@@ -911,7 +913,7 @@ void SuplaDeviceClass::iterate_relaybutton(SuplaChannelPin *pin, TDS_SuplaDevice
 								
 						}			
 					}	
-				pin->time_left = millis();
+				pin->btn_next_check = millis();
 				pin->last_val = val;
 			}
 		}		
@@ -1739,7 +1741,9 @@ void SuplaDeviceClass::channelSetValue(int channel, char value, _supla_int_t Dur
 			delay(50);
 		}
 		if ( Params.cb.save_supla_relay_state != 0) {
-			Params.cb.save_supla_relay_state(Params.reg_dev.channels[channel].Number, value == 1 ? "1" : "0");
+			if ( value != Params.cb.read_supla_relay_state(channel) && channel_pin[channel].flag == RELAY_FLAG_RESTORE) {
+				Params.cb.save_supla_relay_state(Params.reg_dev.channels[channel].Number, value == 1 ? "1" : "0");
+			}
 		}	
 
 	};

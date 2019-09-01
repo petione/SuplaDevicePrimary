@@ -115,6 +115,7 @@ typedef struct SuplaChannelPin {
 	unsigned long time_left;
 	unsigned long bi_time_left;
 	unsigned long vc_time;
+	unsigned long btn_next_check;
 	
 	union {
 		uint8_t last_val;
