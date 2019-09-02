@@ -447,7 +447,7 @@ int SuplaDeviceClass::addRelayButton(int relayPin, int buttonPin, int type_butto
 		Params.reg_dev.channels[c].value[0] = suplaDigitalRead(Params.reg_dev.channels[c].Number, relayPin) == _HI ? 1 : 0;
 	}
 
-	if ( buttonPin > 0 )
+	if ( buttonPin >= 0 )
 	 		  
 		  pinMode(buttonPin, INPUT_PULLUP); 
 		  //Params.reg_dev.channels[c].value[0] = suplaDigitalRead(Params.reg_dev.channels[c].Number, buttonPin) == HIGH ? 1 : 0;	
@@ -880,12 +880,12 @@ void SuplaDeviceClass::iterate_relaybutton(SuplaChannelPin *pin, TDS_SuplaDevice
 	
 	 if ( channel->Type == SUPLA_CHANNELTYPE_RELAY ){
 				 
-			 if ( pin->start == 0) {
+			 if ( pin->start == 0 ) {
 				 if ( pin->flag == RELAY_FLAG_RESTORE && Params.cb.read_supla_relay_state != 0) {
 					int state = Params.cb.read_supla_relay_state(channel->Number);
 					channelSetValue(channel->Number, state, 0);
 					//channelValueChanged(channel->Number, state == HIGH ? 1 : 0);	
-					//Serial.print("channel->Number-"); Serial.print(channel->Number); Serial.print("=="); Serial.println(state); 
+					Serial.print("channel->Number-"); Serial.print(channel->Number); Serial.print("=="); Serial.println(state); 
 				 }
 				 else {
 					uint8_t val1 = suplaDigitalRead(channel->Number, pin->pin1);
@@ -899,7 +899,7 @@ void SuplaDeviceClass::iterate_relaybutton(SuplaChannelPin *pin, TDS_SuplaDevice
 				
 				uint8_t val = suplaDigitalRead(channel->Number, pin->pin2);
 				
-				if ( val != pin->last_val && millis()-pin->btn_next_check >= 100 ) {
+				if ( val != pin->last_val && millis()-pin->btn_next_check >= 100 && pin->pin2 >= 0) {
 					if(val == 0){		
 			 
 						relaySwitch(channel->Number, pin->pin1);	
@@ -1740,10 +1740,8 @@ void SuplaDeviceClass::channelSetValue(int channel, char value, _supla_int_t Dur
 			success = false;
 			delay(50);
 		}
-		if ( Params.cb.save_supla_relay_state != 0) {
-			if ( value != Params.cb.read_supla_relay_state(channel) && channel_pin[channel].flag == RELAY_FLAG_RESTORE) {
-				Params.cb.save_supla_relay_state(Params.reg_dev.channels[channel].Number, value == 1 ? "1" : "0");
-			}
+		if ( Params.cb.save_supla_relay_state != 0 && value != Params.cb.read_supla_relay_state(channel) && channel_pin[channel].flag == RELAY_FLAG_RESTORE) {
+			Params.cb.save_supla_relay_state(Params.reg_dev.channels[channel].Number, value == 1 ? "1" : "0");
 		}	
 
 	};
