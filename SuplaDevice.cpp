@@ -442,9 +442,15 @@ int SuplaDeviceClass::addRelayButton(int relayPin, int buttonPin, int type_butto
 	Params.reg_dev.channels[c].FuncList = functions;
 
 	if ( relayPin != 0 ) {
-		pinMode(relayPin, OUTPUT); 
-		suplaDigitalWrite(Params.reg_dev.channels[c].Number, relayPin, hiIsLo ? HIGH : LOW); 
-		Params.reg_dev.channels[c].value[0] = suplaDigitalRead(Params.reg_dev.channels[c].Number, relayPin) == _HI ? 1 : 0;
+		if ( flag == RELAY_FLAG_RESTORE && Params.cb.read_supla_relay_state != 0) {
+			int state = Params.cb.read_supla_relay_state(c);
+			digitalWrite(relayPin, state);
+			pinMode(relayPin, OUTPUT);
+		} else {	
+			pinMode(relayPin, OUTPUT); 
+			suplaDigitalWrite(Params.reg_dev.channels[c].Number, relayPin, hiIsLo ? HIGH : LOW); 
+			Params.reg_dev.channels[c].value[0] = suplaDigitalRead(Params.reg_dev.channels[c].Number, relayPin) == _HI ? 1 : 0;
+		}
 	}
 
 	if ( buttonPin >= 0 )
