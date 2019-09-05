@@ -447,8 +447,8 @@ int SuplaDeviceClass::addRelayButton(int relayPin, int buttonPin, int type_butto
 			digitalWrite(relayPin, state);
 			pinMode(relayPin, OUTPUT);
 		} else {	
-			pinMode(relayPin, OUTPUT); 
 			suplaDigitalWrite(Params.reg_dev.channels[c].Number, relayPin, hiIsLo ? HIGH : LOW); 
+			pinMode(relayPin, OUTPUT); 
 			Params.reg_dev.channels[c].value[0] = suplaDigitalRead(Params.reg_dev.channels[c].Number, relayPin) == _HI ? 1 : 0;
 		}
 	}
