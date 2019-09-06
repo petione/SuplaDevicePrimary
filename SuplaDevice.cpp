@@ -447,9 +447,9 @@ int SuplaDeviceClass::addRelayButton(int relayPin, int buttonPin, int type_butto
 			digitalWrite(relayPin, state);
 			pinMode(relayPin, OUTPUT);
 		} else {	
-			suplaDigitalWrite(Params.reg_dev.channels[c].Number, relayPin, hiIsLo ? HIGH : LOW); 
 			pinMode(relayPin, OUTPUT); 
-			Params.reg_dev.channels[c].value[0] = suplaDigitalRead(Params.reg_dev.channels[c].Number, relayPin) == _HI ? 1 : 0;
+			suplaDigitalWrite(Params.reg_dev.channels[c].Number, relayPin, hiIsLo ? HIGH : LOW); 
+			//Params.reg_dev.channels[c].value[0] = suplaDigitalRead(Params.reg_dev.channels[c].Number, relayPin) == _HI ? 1 : 0;
 		}
 	}
 
@@ -894,10 +894,24 @@ void SuplaDeviceClass::iterate_relaybutton(SuplaChannelPin *pin, TDS_SuplaDevice
 					Serial.print("channel->Number-"); Serial.print(channel->Number); Serial.print("=="); Serial.println(state); 
 				 }
 				 else {
-					uint8_t val1 = suplaDigitalRead(channel->Number, pin->pin1);
-					channelValueChanged(channel->Number, val1 == HIGH ? 1 : 0);	
-					//channelSetValue(channel->Number, val1 == HIGH ? 1 : 0, 0);
-				 }
+					uint8_t value = suplaDigitalRead(channel->Number, pin->pin1);
+					uint8_t _HI = channel_pin[channel->Number].hiIsLo ? LOW : HIGH;
+					uint8_t _LO = channel_pin[channel->Number].hiIsLo ? HIGH : LOW;
+					 
+						if ( value == 0 ) {
+							if ( channel_pin[channel->Number].pin1 != 0 ) {
+								channelSetValue(channel->Number, _LO, 0);
+							}
+						} else if ( value == 1 ) {
+							if ( channel_pin[channel->Number].pin1 != 0 ) {
+								channelSetValue(channel->Number, _HI, 0);
+							}
+						}
+					Serial.print("RESET channel->Number-"); Serial.print(channel->Number); Serial.print("=="); Serial.println(value);
+					//uint8_t val1 = suplaDigitalRead(channel->Number, pin->pin1);
+					//channelValueChanged(channel->Number, val1 == HIGH ? 1 : 0);	
+					//channelSetValue(channel->Number, val1 == HIGH ? 1 : 0, 0);				
+				}
 				pin->btn_next_check = millis();
 				pin->start = 1;	
 				
