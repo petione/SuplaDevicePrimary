@@ -885,7 +885,9 @@ void SuplaDeviceClass::iterate_relay(SuplaChannelPin *pin, TDS_SuplaDeviceChanne
 void SuplaDeviceClass::iterate_relaybutton(SuplaChannelPin *pin, TDS_SuplaDeviceChannel_B *channel, unsigned long time_diff, int channel_number) {	
 	
 	 if ( channel->Type == SUPLA_CHANNELTYPE_RELAY ){
-				 
+		 
+				uint8_t val = suplaDigitalRead(channel->Number, pin->pin2);	
+				
 			 if ( pin->start == 0 ) {
 				 if ( pin->flag == RELAY_FLAG_RESTORE && Params.cb.read_supla_relay_state != 0) {
 					int state = Params.cb.read_supla_relay_state(channel->Number);
@@ -917,27 +919,23 @@ void SuplaDeviceClass::iterate_relaybutton(SuplaChannelPin *pin, TDS_SuplaDevice
 				
 			 } else {
 				
-				uint8_t val = suplaDigitalRead(channel->Number, pin->pin2);
-				
-				if ( val != pin->last_val && millis()-pin->btn_next_check >= 100 && pin->pin2 >= 0) {
+				if (val != pin->last_val && millis()-pin->btn_next_check >= 100 && pin->pin2 >= 0) {
 					Serial.print("BUTTON channel->Number-"); Serial.print(channel->Number); Serial.print("=="); Serial.println(val);
-					if(val == 0){		
-			 
+					
+					if(val != pin->last_val && val == 0){		
+						
 						relaySwitch(channel->Number, pin->pin1);	
-							
-					}
-					else if (val == 1){
+						
+					} else if (val != pin->last_val && val == 1) {
 			 
-						if(pin->type == INPUT_TYPE_BTN_BISTABLE){
-				
-						relaySwitch(channel->Number, pin->pin1);
-								
+						if (pin->type == INPUT_TYPE_BTN_BISTABLE){
+							relaySwitch(channel->Number, pin->pin1);	
 						}			
 					}	
 				pin->btn_next_check = millis();
-				pin->last_val = val;
 			}
-		}		
+		}	
+		pin->last_val = val;
 	}		
 }
 
