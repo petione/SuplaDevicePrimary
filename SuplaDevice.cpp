@@ -891,7 +891,7 @@ void SuplaDeviceClass::iterate_relaybutton(SuplaChannelPin *pin, TDS_SuplaDevice
 					int state = Params.cb.read_supla_relay_state(channel->Number);
 					channelSetValue(channel->Number, state, 0);
 					//channelValueChanged(channel->Number, state == HIGH ? 1 : 0);	
-					Serial.print("channel->Number-"); Serial.print(channel->Number); Serial.print("=="); Serial.println(state); 
+					Serial.print("RESTORE channel->Number-"); Serial.print(channel->Number); Serial.print("=="); Serial.println(state); 
 				 }
 				 else {
 					uint8_t value = suplaDigitalRead(channel->Number, pin->pin1);
@@ -920,6 +920,7 @@ void SuplaDeviceClass::iterate_relaybutton(SuplaChannelPin *pin, TDS_SuplaDevice
 				uint8_t val = suplaDigitalRead(channel->Number, pin->pin2);
 				
 				if ( val != pin->last_val && millis()-pin->btn_next_check >= 100 && pin->pin2 >= 0) {
+					Serial.print("BUTTON channel->Number-"); Serial.print(channel->Number); Serial.print("=="); Serial.println(val);
 					if(val == 0){		
 			 
 						relaySwitch(channel->Number, pin->pin1);	
