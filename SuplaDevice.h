@@ -111,6 +111,7 @@ typedef struct SuplaChannelPin {
 	int type;
 	int start;
 	int flag;
+	_supla_int_t DurationMS;
 	
 	unsigned long time_left;
 	unsigned long bi_time_left;
@@ -180,7 +181,7 @@ protected:
 	char registered;
 	bool isInitialized(bool msg);
 	void setString(char *dst, const char *src, int max_size);
-	int addChannel(int pin1, int pin2, bool hiIsLo, bool bistable, int type = NULL, int flag = NULL);
+	int addChannel(int pin1, int pin2, bool hiIsLo, bool bistable, int type = NULL, int flag = NULL, _supla_int_t DurationMS = 0);
 	void channelValueChanged(int channel_number, char v, double d, char var);
 	void channelSetValue(int channel, char value, _supla_int_t DurationMS);
 	void channelSetDoubleValue(int channelNum, double value);
@@ -269,7 +270,9 @@ public:
    bool addSensorNO(int sensorPin, bool pullUp);
    bool addSensorNO(int sensorPin);
    
-   int addRelayButton(int relayPin1, int relayPin2, int type_button, int flag, bool hiIsLo, _supla_int_t functions);
+   int addRelayButton(int relayPin1, int relayPin2, int type_button, int flag, bool hiIsLo, _supla_int_t DurationMS, _supla_int_t functions);
+   bool addRelayButton(int relayPin, int relayPin2, int type_button, int flag, bool hiIsLo, _supla_int_t DurationMS);
+   bool addRelayButton(int relayPin, int relayPin2, int type_button, int flag, _supla_int_t DurationMS);
    bool addRelayButton(int relayPin, int relayPin2, int type_button, int flag, bool hiIsLo);
    bool addRelayButton(int relayPin, int relayPin2, int type_button, int flag);
    
@@ -288,7 +291,7 @@ public:
     
    bool relayOn(int channel_number, _supla_int_t DurationMS);
    bool relayOff(int channel_number);
-   bool relaySwitch(int channel_number, int relay);
+   bool relaySwitch(int channel_number, int relay, _supla_int_t DurationMS);
    
    void rollerShutterReveal(int channel_number);
    void rollerShutterShut(int channel_number);
