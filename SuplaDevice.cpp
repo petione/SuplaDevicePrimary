@@ -395,7 +395,7 @@ void SuplaDeviceClass::setName(const char *Name) {
 	setString(Params.reg_dev.Name, Name, SUPLA_DEVICE_NAME_MAXSIZE);
 }
 
-int SuplaDeviceClass::addChannel(int pin1, int pin2, bool hiIsLo, bool bistable, int type, int flag) {
+int SuplaDeviceClass::addChannel(int pin1, int pin2, bool hiIsLo, bool bistable, int type, int flag, _supla_int_t DurationMS) {
 	if ( isInitialized(true) ) return -1;
 	
 	if ( Params.reg_dev.channel_count >= SUPLA_CHANNELMAXCOUNT ) {
@@ -422,6 +422,7 @@ int SuplaDeviceClass::addChannel(int pin1, int pin2, bool hiIsLo, bool bistable,
 	channel_pin[Params.reg_dev.channel_count].type = type;
 	channel_pin[Params.reg_dev.channel_count].start = 0;
 	channel_pin[Params.reg_dev.channel_count].flag = flag;
+	channel_pin[Params.reg_dev.channel_count].DurationMS = DurationMS;
 	channel_pin[Params.reg_dev.channel_count].btn_next_check = 0;
 	
 	Params.reg_dev.channel_count++;
@@ -430,9 +431,9 @@ int SuplaDeviceClass::addChannel(int pin1, int pin2, bool hiIsLo, bool bistable,
 }
 
 
-int SuplaDeviceClass::addRelayButton(int relayPin, int buttonPin, int type_button, int flag, bool hiIsLo, _supla_int_t functions) {
+int SuplaDeviceClass::addRelayButton(int relayPin, int buttonPin, int type_button, int flag, bool hiIsLo, _supla_int_t DurationMS, _supla_int_t functions) {
 	
-	int c = addChannel(relayPin, buttonPin, hiIsLo, false, type_button, flag);
+	int c = addChannel(relayPin, buttonPin, hiIsLo, false, type_button, flag, DurationMS);
 	if ( c == -1 ) return -1;
 	
 	uint8_t _HI = hiIsLo ? LOW : HIGH;
@@ -460,8 +461,28 @@ int SuplaDeviceClass::addRelayButton(int relayPin, int buttonPin, int type_butto
 	return c;
 }
 
+bool SuplaDeviceClass::addRelayButton(int relayPin, int buttonPin, int type_button, int flag, bool hiIsLo, _supla_int_t DurationMS) {
+	return addRelayButton(relayPin, buttonPin, type_button, flag, hiIsLo, DurationMS, SUPLA_BIT_RELAYFUNC_CONTROLLINGTHEGATEWAYLOCK
+																			| SUPLA_BIT_RELAYFUNC_CONTROLLINGTHEGATE
+																			| SUPLA_BIT_RELAYFUNC_CONTROLLINGTHEGARAGEDOOR
+																			| SUPLA_BIT_RELAYFUNC_CONTROLLINGTHEDOORLOCK
+																			| SUPLA_BIT_RELAYFUNC_POWERSWITCH
+																			| SUPLA_BIT_RELAYFUNC_LIGHTSWITCH
+																			| SUPLA_BIT_RELAYFUNC_STAIRCASETIMER) > -1;
+}
+
+bool SuplaDeviceClass::addRelayButton(int relayPin, int buttonPin, int type_button, int flag, _supla_int_t DurationMS) {
+	return addRelayButton(relayPin, buttonPin, type_button, flag, false, DurationMS, SUPLA_BIT_RELAYFUNC_CONTROLLINGTHEGATEWAYLOCK
+																			| SUPLA_BIT_RELAYFUNC_CONTROLLINGTHEGATE
+																			| SUPLA_BIT_RELAYFUNC_CONTROLLINGTHEGARAGEDOOR
+																			| SUPLA_BIT_RELAYFUNC_CONTROLLINGTHEDOORLOCK
+																			| SUPLA_BIT_RELAYFUNC_POWERSWITCH
+																			| SUPLA_BIT_RELAYFUNC_LIGHTSWITCH
+																			| SUPLA_BIT_RELAYFUNC_STAIRCASETIMER) > -1;
+}
+
 bool SuplaDeviceClass::addRelayButton(int relayPin, int buttonPin, int type_button, int flag, bool hiIsLo) {
-	return addRelayButton(relayPin, buttonPin, type_button, flag, hiIsLo, SUPLA_BIT_RELAYFUNC_CONTROLLINGTHEGATEWAYLOCK
+	return addRelayButton(relayPin, buttonPin, type_button, flag, hiIsLo, 0, SUPLA_BIT_RELAYFUNC_CONTROLLINGTHEGATEWAYLOCK
 																			| SUPLA_BIT_RELAYFUNC_CONTROLLINGTHEGATE
 																			| SUPLA_BIT_RELAYFUNC_CONTROLLINGTHEGARAGEDOOR
 																			| SUPLA_BIT_RELAYFUNC_CONTROLLINGTHEDOORLOCK
@@ -471,7 +492,7 @@ bool SuplaDeviceClass::addRelayButton(int relayPin, int buttonPin, int type_butt
 }
 
 bool SuplaDeviceClass::addRelayButton(int relayPin, int buttonPin, int type_button, int flag) {
-	return addRelayButton(relayPin, buttonPin, type_button, flag, false, SUPLA_BIT_RELAYFUNC_CONTROLLINGTHEGATEWAYLOCK
+	return addRelayButton(relayPin, buttonPin, type_button, flag, false, 0, SUPLA_BIT_RELAYFUNC_CONTROLLINGTHEGATEWAYLOCK
 																			| SUPLA_BIT_RELAYFUNC_CONTROLLINGTHEGATE
 																			| SUPLA_BIT_RELAYFUNC_CONTROLLINGTHEGARAGEDOOR
 																			| SUPLA_BIT_RELAYFUNC_CONTROLLINGTHEDOORLOCK
@@ -924,12 +945,12 @@ void SuplaDeviceClass::iterate_relaybutton(SuplaChannelPin *pin, TDS_SuplaDevice
 					
 					if(val != pin->last_val && val == 0){		
 						
-						relaySwitch(channel->Number, pin->pin1);	
+						relaySwitch(channel->Number, pin->pin1, pin->DurationMS);	
 						
 					} else if (val != pin->last_val && val == 1) {
 			 
 						if (pin->type == INPUT_TYPE_BTN_BISTABLE){
-							relaySwitch(channel->Number, pin->pin1);	
+							relaySwitch(channel->Number, pin->pin1, 0);	
 						}			
 					}	
 				pin->btn_next_check = millis();
@@ -1907,10 +1928,10 @@ bool SuplaDeviceClass::relayOff(int channel_number) {
     channelSetValue(channel_number, LOW, 0);
 }
 
-bool SuplaDeviceClass::relaySwitch(int channel_number, int relay) {
+bool SuplaDeviceClass::relaySwitch(int channel_number, int relay, _supla_int_t DurationMS) {
 	uint8_t val = suplaDigitalRead_isHI(channel_number, relay); 
 	uint8_t _val = val == HIGH ? LOW : HIGH;
-	channelSetValue(channel_number, _val, 0); 
+	channelSetValue(channel_number, _val, DurationMS); 
 	return _val;
  }
 
