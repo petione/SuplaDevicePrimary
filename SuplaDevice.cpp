@@ -654,7 +654,7 @@ void SuplaDeviceClass::setRGBWvalue(int channelNum, char value[SUPLA_CHANNELVALU
 
 int SuplaDeviceClass::addDS18B20Thermometer() {
 	
-	int c = addChannel(-1, -1, false, false);
+	int c = addChannel(0, 0, false, false);
 	if ( c == -1 ) return false; 
 	
 	Params.reg_dev.channels[c].Type = SUPLA_CHANNELTYPE_THERMOMETERDS18B20;
@@ -666,7 +666,7 @@ int SuplaDeviceClass::addDS18B20Thermometer() {
 
 int SuplaDeviceClass::addDHT(int Type) {
 	
-	int c = addChannel(-1, -1, false, false);
+	int c = addChannel(0, 0, false, false);
 	if ( c == -1 ) return false; 
 	
 	Params.reg_dev.channels[c].Type = Type;
@@ -695,7 +695,7 @@ int SuplaDeviceClass::addAM2302() {
 
 bool SuplaDeviceClass::addRgbControllerAndDimmer(void) {
 	
-	int c = addChannel(-1, -1, false, false);
+	int c = addChannel(0, 0, false, false);
 	if ( c == -1 ) return false; 
 	
 	Params.reg_dev.channels[c].Type = SUPLA_CHANNELTYPE_DIMMERANDRGBLED;
@@ -704,7 +704,7 @@ bool SuplaDeviceClass::addRgbControllerAndDimmer(void) {
 
 bool SuplaDeviceClass::addRgbController(void) {
 	
-	int c = addChannel(-1, -1, false, false);
+	int c = addChannel(0, 0, false, false);
 	if ( c == -1 ) return false; 
 	
 	Params.reg_dev.channels[c].Type = SUPLA_CHANNELTYPE_RGBLEDCONTROLLER;
@@ -713,7 +713,7 @@ bool SuplaDeviceClass::addRgbController(void) {
 
 bool SuplaDeviceClass::addDimmer(void) {
 	
-	int c = addChannel(-1, -1, false, false);
+	int c = addChannel(0, 0, false, false);
 	if ( c == -1 ) return false; 
 	
 	Params.reg_dev.channels[c].Type = SUPLA_CHANNELTYPE_DIMMER;
@@ -726,7 +726,7 @@ bool SuplaDeviceClass::addSensorNO(int sensorPin) {
 
 bool SuplaDeviceClass::addDistanceSensor(void) {
 
-    int c = addChannel(-1, -1, false, false);
+    int c = addChannel(0, 0, false, false);
     if ( c == -1 ) return false;
     
     Params.reg_dev.channels[c].Type = SUPLA_CHANNELTYPE_DISTANCESENSOR;
@@ -737,7 +737,7 @@ bool SuplaDeviceClass::addDistanceSensor(void) {
 
 bool SuplaDeviceClass::addPressureSensor(void) {
     
-    int c = addChannel(-1, -1, false, false);
+    int c = addChannel(0, 0, false, false);
     if ( c == -1 ) return false; 
 	
     Params.reg_dev.channels[c].Type = SUPLA_CHANNELTYPE_PRESSURESENSOR;
@@ -748,7 +748,7 @@ bool SuplaDeviceClass::addPressureSensor(void) {
 
 bool SuplaDeviceClass::addWeightSensor(void) {
     
-    int c = addChannel(-1, -1, false, false);
+    int c = addChannel(0, 0, false, false);
     if ( c == -1 ) return false; 
 	
     Params.reg_dev.channels[c].Type = SUPLA_CHANNELTYPE_WEIGHTSENSOR;
@@ -759,7 +759,7 @@ bool SuplaDeviceClass::addWeightSensor(void) {
 
 bool SuplaDeviceClass::addWindSensor(void) {
     
-    int c = addChannel(-1, -1, false, false);
+    int c = addChannel(0, 0, false, false);
     if ( c == -1 ) return false; 
 	
     Params.reg_dev.channels[c].Type = SUPLA_CHANNELTYPE_WINDSENSOR;
@@ -770,7 +770,7 @@ bool SuplaDeviceClass::addWindSensor(void) {
 
 bool SuplaDeviceClass::addRainSensor(void) {
     
-    int c = addChannel(-1, -1, false, false);
+    int c = addChannel(0, 0, false, false);
     if ( c == -1 ) return false; 
 	
     Params.reg_dev.channels[c].Type = SUPLA_CHANNELTYPE_RAINSENSOR;
