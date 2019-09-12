@@ -512,7 +512,7 @@ int SuplaDeviceClass::addRelay(int relayPin1, int relayPin2, bool hiIsLo, bool b
 	Params.reg_dev.channels[c].Type = SUPLA_CHANNELTYPE_RELAY;
 	Params.reg_dev.channels[c].FuncList = functions;
 	
-	if ( relaypin1 != -1 ) {
+	if ( relayPin1 != -1 ) {
 		pinMode(relayPin1, OUTPUT); 
 		suplaDigitalWrite(Params.reg_dev.channels[c].Number, relayPin1, hiIsLo ? HIGH : LOW); 
 		
@@ -1752,7 +1752,7 @@ void SuplaDeviceClass::channelSetValue(int channel, char value, _supla_int_t Dur
 			}
 				
 
-			if ( channel_pin[channel].Pin2 != -1 
+			if ( channel_pin[channel].pin2 != -1 
 					&& channel_pin[channel].bistable == false ) {
 				suplaDigitalWrite(Params.reg_dev.channels[channel].Number, channel_pin[channel].pin2, _LO); 
 				
@@ -1763,7 +1763,7 @@ void SuplaDeviceClass::channelSetValue(int channel, char value, _supla_int_t Dur
 			
 		} else if ( value == 1 ) {
 			
-			if ( channel_pin[channel].Pin2 != -1
+			if ( channel_pin[channel].pin2 != -1
 					&& channel_pin[channel].bistable == false ) {
 				suplaDigitalWrite(Params.reg_dev.channels[channel].Number, channel_pin[channel].pin2, _LO); 
 				delay(50);
