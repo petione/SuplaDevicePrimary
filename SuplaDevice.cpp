@@ -540,7 +540,7 @@ int SuplaDeviceClass::addRelay(int relayPin1, int relayPin2, bool hiIsLo, bool b
 }
 
 bool SuplaDeviceClass::addRelay(int relayPin, bool hiIsLo) {
-	return addRelay(relayPin, 0, hiIsLo, false, SUPLA_BIT_RELAYFUNC_CONTROLLINGTHEGATEWAYLOCK
+	return addRelay(relayPin, -1, hiIsLo, false, SUPLA_BIT_RELAYFUNC_CONTROLLINGTHEGATEWAYLOCK
                               | SUPLA_BIT_RELAYFUNC_CONTROLLINGTHEGATE
                               | SUPLA_BIT_RELAYFUNC_CONTROLLINGTHEGARAGEDOOR
                               | SUPLA_BIT_RELAYFUNC_CONTROLLINGTHEDOORLOCK
