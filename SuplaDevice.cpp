@@ -442,7 +442,7 @@ int SuplaDeviceClass::addRelayButton(int relayPin, int buttonPin, int type_butto
 	Params.reg_dev.channels[c].Type = SUPLA_CHANNELTYPE_RELAY;
 	Params.reg_dev.channels[c].FuncList = functions;
 
-	if ( relayPin != 0 ) {
+	if ( relayPin != -1 ) {
 		if ( flag == RELAY_FLAG_RESTORE && Params.cb.read_supla_relay_state != 0) {
 			int state = Params.cb.read_supla_relay_state(c);
 			digitalWrite(relayPin, state);
@@ -454,7 +454,7 @@ int SuplaDeviceClass::addRelayButton(int relayPin, int buttonPin, int type_butto
 		}
 	}
 
-	if ( buttonPin >= 0 )
+	if ( buttonPin != -1 )
 	 		  
 		  pinMode(buttonPin, INPUT_PULLUP); 
 		  //Params.reg_dev.channels[c].value[0] = suplaDigitalRead(Params.reg_dev.channels[c].Number, buttonPin) == HIGH ? 1 : 0;	
@@ -512,7 +512,7 @@ int SuplaDeviceClass::addRelay(int relayPin1, int relayPin2, bool hiIsLo, bool b
 	Params.reg_dev.channels[c].Type = SUPLA_CHANNELTYPE_RELAY;
 	Params.reg_dev.channels[c].FuncList = functions;
 	
-	if ( relayPin1 != 0 ) {
+	if ( relayPin1 != -1 ) {
 		pinMode(relayPin1, OUTPUT); 
 		suplaDigitalWrite(Params.reg_dev.channels[c].Number, relayPin1, hiIsLo ? HIGH : LOW); 
 		
@@ -520,7 +520,7 @@ int SuplaDeviceClass::addRelay(int relayPin1, int relayPin2, bool hiIsLo, bool b
 			Params.reg_dev.channels[c].value[0] = suplaDigitalRead(Params.reg_dev.channels[c].Number, relayPin1) == _HI ? 1 : 0;
 	}
 
-	if ( relayPin2 != 0 )
+	if ( relayPin2 != -1 )
 	  if ( bistable ) {
 		  
 		  pinMode(relayPin2, INPUT); 
@@ -540,7 +540,7 @@ int SuplaDeviceClass::addRelay(int relayPin1, int relayPin2, bool hiIsLo, bool b
 }
 
 bool SuplaDeviceClass::addRelay(int relayPin, bool hiIsLo) {
-	return addRelay(relayPin, 0, hiIsLo, false, SUPLA_BIT_RELAYFUNC_CONTROLLINGTHEGATEWAYLOCK
+	return addRelay(relayPin, -1, hiIsLo, false, SUPLA_BIT_RELAYFUNC_CONTROLLINGTHEGATEWAYLOCK
                               | SUPLA_BIT_RELAYFUNC_CONTROLLINGTHEGATE
                               | SUPLA_BIT_RELAYFUNC_CONTROLLINGTHEGARAGEDOOR
                               | SUPLA_BIT_RELAYFUNC_CONTROLLINGTHEDOORLOCK
@@ -596,7 +596,7 @@ void SuplaDeviceClass::setRollerShutterButtons(int channel_number, int btnUpPin,
 
 bool SuplaDeviceClass::addSensorNO(int sensorPin, bool pullUp) {
 	
-	int c = addChannel(sensorPin, 0, false, false);
+	int c = addChannel(sensorPin, -1, false, false);
 	if ( c == -1 ) return false; 
 	
 	Params.reg_dev.channels[c].Type = SUPLA_CHANNELTYPE_SENSORNO;
@@ -922,11 +922,11 @@ void SuplaDeviceClass::iterate_relaybutton(SuplaChannelPin *pin, TDS_SuplaDevice
 					uint8_t _LO = channel_pin[channel->Number].hiIsLo ? HIGH : LOW;
 					 
 						if ( value == 0 ) {
-							if ( channel_pin[channel->Number].pin1 != 0 ) {
+							if ( channel_pin[channel->Number].pin1 != -1 ) {
 								channelSetValue(channel->Number, _LO, 0);
 							}
 						} else if ( value == 1 ) {
-							if ( channel_pin[channel->Number].pin1 != 0 ) {
+							if ( channel_pin[channel->Number].pin1 != -1 ) {
 								channelSetValue(channel->Number, _HI, 0);
 							}
 						}
@@ -1745,14 +1745,14 @@ void SuplaDeviceClass::channelSetValue(int channel, char value, _supla_int_t Dur
 		
 		if ( value == 0 ) {
 			
-			if ( channel_pin[channel].pin1 != 0 ) {
+			if ( channel_pin[channel].pin1 != -1 ) {
 				suplaDigitalWrite(Params.reg_dev.channels[channel].Number, channel_pin[channel].pin1, _LO); 
 				
 				success = suplaDigitalRead(Params.reg_dev.channels[channel].Number, channel_pin[channel].pin1) == _LO;
 			}
 				
 
-			if ( channel_pin[channel].pin2 != 0 
+			if ( channel_pin[channel].pin2 != -1 
 					&& channel_pin[channel].bistable == false ) {
 				suplaDigitalWrite(Params.reg_dev.channels[channel].Number, channel_pin[channel].pin2, _LO); 
 				
@@ -1763,13 +1763,13 @@ void SuplaDeviceClass::channelSetValue(int channel, char value, _supla_int_t Dur
 			
 		} else if ( value == 1 ) {
 			
-			if ( channel_pin[channel].pin2 != 0
+			if ( channel_pin[channel].pin2 != -1
 					&& channel_pin[channel].bistable == false ) {
 				suplaDigitalWrite(Params.reg_dev.channels[channel].Number, channel_pin[channel].pin2, _LO); 
 				delay(50);
 			}
 			
-			if ( channel_pin[channel].pin1 != 0 ) {
+			if ( channel_pin[channel].pin1 != -1 ) {
 				suplaDigitalWrite(Params.reg_dev.channels[channel].Number, channel_pin[channel].pin1, _HI); 
 				
 				if ( !success )
