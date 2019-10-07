@@ -118,11 +118,9 @@ typedef struct SuplaChannelPin {
 	unsigned long vc_time;
 	unsigned long btn_next_check;
 	
-	union {
-		uint8_t last_val;
-		double last_val_dbl1;
-		double last_val_dbl2;
-	};
+	uint8_t last_val;
+	double last_val_dbl1;
+	double last_val_dbl2;
 };
 
 typedef struct SuplaDeviceRollerShutterTask {
@@ -284,7 +282,7 @@ public:
    bool addRgbController(void);
    bool addDimmer(void);
    bool addDistanceSensor(void);
-   bool addPressureSensor(void);
+   int addPressureSensor(void);
    bool addWeightSensor(void);
    bool addWindSensor(void);
    bool addRainSensor(void);

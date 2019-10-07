@@ -414,7 +414,7 @@ int SuplaDeviceClass::addChannel(int pin1, int pin2, bool hiIsLo, bool bistable,
 	channel_pin[Params.reg_dev.channel_count].pin2 = pin2; 
 	channel_pin[Params.reg_dev.channel_count].hiIsLo = hiIsLo;
 	channel_pin[Params.reg_dev.channel_count].bistable = bistable;
-	channel_pin[Params.reg_dev.channel_count].time_left = 0;
+	channel_pin[Params.reg_dev.channel_count].time_left = 1000*Params.reg_dev.channel_count;
 	channel_pin[Params.reg_dev.channel_count].vc_time = 0;
 	channel_pin[Params.reg_dev.channel_count].bi_time_left = 0;
 	channel_pin[Params.reg_dev.channel_count].last_val = suplaDigitalRead(Params.reg_dev.channel_count, bistable ? pin2 : pin1);
@@ -735,7 +735,7 @@ bool SuplaDeviceClass::addDistanceSensor(void) {
     
 }
 
-bool SuplaDeviceClass::addPressureSensor(void) {
+int SuplaDeviceClass::addPressureSensor(void) {
     
     int c = addChannel(0, 0, false, false);
     if ( c == -1 ) return false; 
@@ -743,7 +743,8 @@ bool SuplaDeviceClass::addPressureSensor(void) {
     Params.reg_dev.channels[c].Type = SUPLA_CHANNELTYPE_PRESSURESENSOR;
     channel_pin[c].last_val_dbl1 = -1;
     channelSetDoubleValue(c, channel_pin[c].last_val_dbl1);
-    
+	
+	return c;   
 }
 
 bool SuplaDeviceClass::addWeightSensor(void) {
@@ -1641,6 +1642,7 @@ void SuplaDeviceClass::onRegisterResult(TSD_SuplaRegisterDeviceResult *register_
             server_activity_timeout = register_device_result->activity_timeout;
             registered = 1;
             
+			last_iterate_time = millis();
             status(STATUS_REGISTERED_AND_READY, "Registered and ready.");
             
             if ( server_activity_timeout != ACTIVITY_TIMEOUT ) {
