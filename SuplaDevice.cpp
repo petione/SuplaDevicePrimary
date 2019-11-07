@@ -908,7 +908,6 @@ void SuplaDeviceClass::iterate_relaybutton(SuplaChannelPin *pin, TDS_SuplaDevice
 	
 	 if ( channel->Type == SUPLA_CHANNELTYPE_RELAY ){
 		 
-				uint8_t val = suplaDigitalRead(channel->Number, pin->pin2);	
 				
 			 if ( pin->start == 0 ) {
 				 if ( pin->flag == RELAY_FLAG_RESTORE && Params.cb.read_supla_relay_state != 0) {
@@ -940,9 +939,11 @@ void SuplaDeviceClass::iterate_relaybutton(SuplaChannelPin *pin, TDS_SuplaDevice
 				pin->start = 1;	
 				
 			 } else {
+				 
+				uint8_t val = suplaDigitalRead(channel->Number, pin->pin2);	
 				
 				if (val != pin->last_val && millis()-pin->btn_next_check >= 100 && pin->pin2 >= 0) {
-					Serial.print("BUTTON channel->Number-"); Serial.print(channel->Number); Serial.print("=="); Serial.println(val);
+					Serial.print("BUTTON channel->Number-"); Serial.print(channel->Number); Serial.print("=="); Serial.print(val); Serial.print(" button->pin == "); Serial.println(pin->pin2);
 					
 					if(val != pin->last_val && val == 0){		
 						
@@ -956,8 +957,8 @@ void SuplaDeviceClass::iterate_relaybutton(SuplaChannelPin *pin, TDS_SuplaDevice
 					}	
 				pin->btn_next_check = millis();
 			}
+			pin->last_val = val;
 		}	
-		pin->last_val = val;
 	}		
 }
 
@@ -1787,8 +1788,12 @@ void SuplaDeviceClass::channelSetValue(int channel, char value, _supla_int_t Dur
 			success = false;
 			delay(50);
 		}
-		if ( Params.cb.save_supla_relay_state != 0 && value != Params.cb.read_supla_relay_state(channel) && channel_pin[channel].flag == RELAY_FLAG_RESTORE) {
-			Params.cb.save_supla_relay_state(Params.reg_dev.channels[channel].Number, value == 1 ? "1" : "0");
+		if ( Params.cb.save_supla_relay_state != 0 && 
+			 suplaDigitalRead(Params.reg_dev.channels[channel].Number, channel_pin[channel].pin1) != Params.cb.read_supla_relay_state(channel) && 
+			 channel_pin[channel].flag == RELAY_FLAG_RESTORE && 
+			 channel_pin[channel].start == 1 ) {
+			
+			Params.cb.save_supla_relay_state(Params.reg_dev.channels[channel].Number, suplaDigitalRead(Params.reg_dev.channels[channel].Number, channel_pin[channel].pin1) == 1 ? "1" : "0");
 		}	
 
 	};
