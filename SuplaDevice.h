@@ -22,6 +22,7 @@
 
 #define INPUT_TYPE_BTN_BISTABLE			0 
 #define INPUT_TYPE_BTN_MONOSTABLE		1 
+#define INPUT_TYPE_BTN_DURATION			2 
 
 #define RELAY_FLAG_RESET				0
 #define RELAY_FLAG_RESTORE				1
@@ -191,7 +192,6 @@ protected:
 
 	SuplaDeviceParams Params;
 	_supla_int_t server_activity_timeout, last_response, last_sent;
-	SuplaChannelPin *channel_pin;
     
     int rs_count;
     SuplaDeviceRollerShutter *roller_shutter;
@@ -247,6 +247,8 @@ public:
    SuplaDeviceClass();
    ~SuplaDeviceClass();
    
+   SuplaChannelPin *channel_pin;
+   
    void channelValueChanged(int channel_number, char v);
    void channelDoubleValueChanged(int channel_number, double v);
     
@@ -269,10 +271,10 @@ public:
    bool addSensorNO(int sensorPin);
    
    int addRelayButton(int relayPin1, int relayPin2, int type_button, int flag, bool hiIsLo, _supla_int_t DurationMS, _supla_int_t functions);
-   bool addRelayButton(int relayPin, int relayPin2, int type_button, int flag, bool hiIsLo, _supla_int_t DurationMS);
-   bool addRelayButton(int relayPin, int relayPin2, int type_button, int flag, _supla_int_t DurationMS);
-   bool addRelayButton(int relayPin, int relayPin2, int type_button, int flag, bool hiIsLo);
-   bool addRelayButton(int relayPin, int relayPin2, int type_button, int flag);
+   int addRelayButton(int relayPin1, int relayPin2, int type_button, int flag, bool hiIsLo, _supla_int_t DurationMS);
+   int addRelayButton(int relayPin1, int relayPin2, int type_button, int flag, bool hiIsLo);
+   int addRelayButton(int relayPin1, int relayPin2, int type_button, int flag, _supla_int_t DurationMS);
+   int addRelayButton(int relayPin1, int relayPin2, int type_button, int flag);
    
    int addDS18B20Thermometer();
    int addDHT11();
