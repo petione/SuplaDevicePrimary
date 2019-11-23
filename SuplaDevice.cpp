@@ -932,7 +932,7 @@ void SuplaDeviceClass::iterate_relaybutton(SuplaChannelPin *pin, TDS_SuplaDevice
 				if ((millis()-pin->btn_next_check >= 250) && pin->pin2 >= 0) {
 					
 					if(val != pin->last_val && val == 0){		
-						Serial.print("BUTTON channel->Number-"); Serial.print(channel->Number); Serial.print("=="); Serial.println(val);
+						Serial.print("BUTTON channel->Number-"); Serial.print(channel->Number); Serial.print("=="); Serial.print(val);  Serial.print(" DurationMS=="); Serial.println(pin->DurationMS);
 						relaySwitch(channel->Number, pin->pin1, pin->DurationMS);	
 						
 					} else if (val != pin->last_val && val == 1) {
@@ -1764,8 +1764,11 @@ void SuplaDeviceClass::channelSetValue(int channel, char value, _supla_int_t Dur
 				if ( !success )
 					success = suplaDigitalRead(Params.reg_dev.channels[channel].Number, channel_pin[channel].pin1) == _HI;
 				
-				if ( DurationMS > 0 )
+				if ( DurationMS > 0 ) {
 					channel_pin[channel].time_left = DurationMS;
+					if ( channel_pin[channel].type == INPUT_TYPE_BTN_DURATION )
+						channel_pin[channel].DurationMS = DurationMS;
+				}
 			}
 			
 		}
