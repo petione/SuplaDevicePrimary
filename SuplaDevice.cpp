@@ -937,7 +937,7 @@ void SuplaDeviceClass::iterate_relaybutton(SuplaChannelPin *pin, TDS_SuplaDevice
 						
 					} else if (val != pin->last_val && val == 1) {
 			 
-						if (pin->type == INPUT_TYPE_BTN_BISTABLE){
+						if (pin->type == INPUT_TYPE_BTN_BISTABLE && pin->DurationMS == 0){
 							relaySwitch(channel->Number, pin->pin1, 0);	
 						}			
 					}	
@@ -1766,8 +1766,9 @@ void SuplaDeviceClass::channelSetValue(int channel, char value, _supla_int_t Dur
 				
 				if ( DurationMS > 0 ) {
 					channel_pin[channel].time_left = DurationMS;
-					if ( channel_pin[channel].type == INPUT_TYPE_BTN_DURATION )
-						channel_pin[channel].DurationMS = DurationMS;
+					channel_pin[channel].DurationMS = DurationMS;
+				} else {
+					channel_pin[channel].DurationMS = DurationMS;
 				}
 			}
 			
