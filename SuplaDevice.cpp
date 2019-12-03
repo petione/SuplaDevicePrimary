@@ -306,6 +306,8 @@ bool SuplaDeviceClass::begin(IPAddress *local_ip, char GUID[SUPLA_GUID_SIZE], ui
 	
 	srpc = srpc_init(&srpc_params);
 	
+	srpc_set_proto_version(srpc, 9); // Set Supla protocol interface version to 9
+	
     if ( rs_count > 0 || impl_arduino_timer ) {
         
         for(int a=0;a<rs_count;a++) {
@@ -1697,6 +1699,7 @@ void SuplaDeviceClass::channelValueChanged(int channel_number, char v, double d,
 			value[0] = v;
 		else if ( var == 2 ) 
 			setDoubleValue(value, d);
+		memcpy(Params.reg_dev.channels[channel_number].value, value, 8);		
         
         supla_log(LOG_DEBUG, "Value changed");
 
