@@ -21,10 +21,13 @@
 #include <IPAddress.h>
 
 #define INPUT_TYPE_BTN_BISTABLE			0 
-#define INPUT_TYPE_BTN_MONOSTABLE		1 
+#define INPUT_TYPE_BTN_MONOSTABLE		1
+#define INPUT_TYPE_BTN_NONE				-1 
 
 #define RELAY_FLAG_RESET				0
 #define RELAY_FLAG_RESTORE				1
+#define RELAY_FLAG_ON					2
+#define RELAY_FLAG_OFF					3
 
 #define ACTIVITY_TIMEOUT 30
 
