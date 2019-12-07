@@ -442,6 +442,7 @@ int SuplaDeviceClass::addRelayButton(int relayPin, int buttonPin, int type_butto
 	uint8_t _LO = hiIsLo ? HIGH : LOW;
 	
 	Params.reg_dev.channels[c].Type = SUPLA_CHANNELTYPE_RELAY;
+	Params.reg_dev.channels[c].Default = SUPLA_CHANNELFNC_POWERSWITCH;
 	Params.reg_dev.channels[c].FuncList = functions;
 
 	if ( relayPin != -1 ) {
@@ -678,6 +679,7 @@ int SuplaDeviceClass::addDHT(int Type) {
 	if ( c == -1 ) return false; 
 	
 	Params.reg_dev.channels[c].Type = Type;
+	Params.reg_dev.channels[c].Default = SUPLA_CHANNELFNC_HUMIDITYANDTEMPERATURE;
 	channel_pin[c].last_val_dbl1 = -275;	
 	channel_pin[c].last_val_dbl2 = -1;	
 	
