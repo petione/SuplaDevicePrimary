@@ -665,8 +665,8 @@ int SuplaDeviceClass::addDS18B20Thermometer() {
 	
 	int c = addChannel(0, 0, false, false);
 	if ( c == -1 ) return false; 
-	
 	Params.reg_dev.channels[c].Type = SUPLA_CHANNELTYPE_THERMOMETERDS18B20;
+	channel_pin[c].time_left = 20000 + (1000 * c);
 	channel_pin[c].last_val_dbl1 = -275;
     
 	channelSetDoubleValue(c, channel_pin[c].last_val_dbl1);
@@ -1504,19 +1504,6 @@ void SuplaDeviceClass::iterate(void) {
     int a;
     unsigned long _millis = millis();
     unsigned long time_diff = abs(_millis - last_iterate_time);
-	if ( !Params.cb.svr_connected() ) {
-		if ( time_diff > 0 ) {
-			for(a=0;a<Params.reg_dev.channel_count;a++) {
-				
-				iterate_relay(&channel_pin[a], &Params.reg_dev.channels[a], time_diff, a); // jest potrzebne do odliczenia czasu iteracji https://forum.supla.org/viewtopic.php?p=48745#p48745
-                iterate_sensor(&channel_pin[a], &Params.reg_dev.channels[a], time_diff, a);
-                iterate_thermometer(&channel_pin[a], &Params.reg_dev.channels[a], time_diff, a);
-				iterate_relaybutton(&channel_pin[a], &Params.reg_dev.channels[a], time_diff, a); 
-				
-			}
-			last_iterate_time = millis();
-		}
-	}
     
     if ( wait_for_iterate != 0
          && _millis < wait_for_iterate ) {
@@ -1530,6 +1517,17 @@ void SuplaDeviceClass::iterate(void) {
 	if ( !isInitialized(false) ) return;
 	
 	if ( !Params.cb.svr_connected() ) {
+		
+		if ( time_diff > 0 ) {
+			for(a=0;a<Params.reg_dev.channel_count;a++) {
+				iterate_relay(&channel_pin[a], &Params.reg_dev.channels[a], time_diff, a); // jest potrzebne do odliczenia czasu iteracji https://forum.supla.org/viewtopic.php?p=48745#p48745
+                iterate_sensor(&channel_pin[a], &Params.reg_dev.channels[a], time_diff, a);
+                iterate_thermometer(&channel_pin[a], &Params.reg_dev.channels[a], time_diff, a);
+				iterate_relaybutton(&channel_pin[a], &Params.reg_dev.channels[a], time_diff, a); 
+				
+			}
+			last_iterate_time = millis();
+		}		
 		
 		status(STATUS_DISCONNECTED, "Not connected");
 	    registered = 0;
