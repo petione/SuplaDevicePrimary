@@ -939,7 +939,7 @@ void SuplaDeviceClass::iterate_relaybutton(SuplaChannelPin *pin, TDS_SuplaDevice
 			 } else {
 				uint8_t val = suplaDigitalRead(channel->Number, pin->pin2);	
 				
-				if ((millis()-pin->btn_next_check >= 250) && pin->pin2 >= 0) {
+				if ((millis()-pin->btn_next_check >= 200) && pin->pin2 >= 0) {
 					
 					if(val != pin->last_val && val == 0){		
 						Serial.print("BUTTON channel->Number-"); Serial.print(channel->Number); Serial.print("=="); Serial.print(val);  Serial.print(" DurationMS=="); Serial.println(pin->DurationMS);
