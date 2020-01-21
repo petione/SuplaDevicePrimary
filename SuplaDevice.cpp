@@ -666,7 +666,7 @@ int SuplaDeviceClass::addDS18B20Thermometer() {
 	int c = addChannel(0, 0, false, false);
 	if ( c == -1 ) return false; 
 	Params.reg_dev.channels[c].Type = SUPLA_CHANNELTYPE_THERMOMETERDS18B20;
-	channel_pin[c].time_left = 20000 + (1000 * c);
+	channel_pin[c].time_left = 1000 * c;
 	channel_pin[c].last_val_dbl1 = -275;
     
 	channelSetDoubleValue(c, channel_pin[c].last_val_dbl1);
@@ -750,6 +750,7 @@ int SuplaDeviceClass::addPressureSensor(void) {
     int c = addChannel(0, 0, false, false);
     if ( c == -1 ) return false; 
 	
+	Params.reg_dev.channels[c].Default  = SUPLA_CHANNELFNC_PRESSURESENSOR;
     Params.reg_dev.channels[c].Type = SUPLA_CHANNELTYPE_PRESSURESENSOR;
     channel_pin[c].last_val_dbl1 = -1;
     channelSetDoubleValue(c, channel_pin[c].last_val_dbl1);
