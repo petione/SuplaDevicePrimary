@@ -940,7 +940,7 @@ void SuplaDeviceClass::iterate_relaybutton(SuplaChannelPin *pin, TDS_SuplaDevice
 			 } else {
 				uint8_t val = suplaDigitalRead(channel->Number, pin->pin2);	
 				
-				if ((millis()-pin->btn_next_check >= 200) && pin->pin2 >= 0) {
+				if ((millis()-pin->btn_next_check >= 100) && pin->pin2 >= 0) {
 					
 					if(val != pin->last_val && val == 0){		
 						Serial.print("BUTTON channel->Number-"); Serial.print(channel->Number); Serial.print("=="); Serial.print(val);  Serial.print(" DurationMS=="); Serial.println(pin->DurationMS);
@@ -1505,7 +1505,20 @@ void SuplaDeviceClass::iterate(void) {
     int a;
     unsigned long _millis = millis();
     unsigned long time_diff = abs(_millis - last_iterate_time);
-    
+	
+	if ( !isInitialized(false) ) return;
+
+	if ( time_diff > 0 ) {
+		for(a=0;a<Params.reg_dev.channel_count;a++) {
+			iterate_relay(&channel_pin[a], &Params.reg_dev.channels[a], time_diff, a); // jest potrzebne do odliczenia czasu iteracji https://forum.supla.org/viewtopic.php?p=48745#p48745
+            iterate_sensor(&channel_pin[a], &Params.reg_dev.channels[a], time_diff, a);
+            iterate_thermometer(&channel_pin[a], &Params.reg_dev.channels[a], time_diff, a);
+			iterate_relaybutton(&channel_pin[a], &Params.reg_dev.channels[a], time_diff, a); 
+			
+		}
+		last_iterate_time = millis();
+	}
+		
     if ( wait_for_iterate != 0
          && _millis < wait_for_iterate ) {
     
@@ -1514,21 +1527,8 @@ void SuplaDeviceClass::iterate(void) {
     } else {
         wait_for_iterate = 0;
     }
-    
-	if ( !isInitialized(false) ) return;
 	
-	if ( !Params.cb.svr_connected() ) {
-		
-		if ( time_diff > 0 ) {
-			for(a=0;a<Params.reg_dev.channel_count;a++) {
-				iterate_relay(&channel_pin[a], &Params.reg_dev.channels[a], time_diff, a); // jest potrzebne do odliczenia czasu iteracji https://forum.supla.org/viewtopic.php?p=48745#p48745
-                iterate_sensor(&channel_pin[a], &Params.reg_dev.channels[a], time_diff, a);
-                iterate_thermometer(&channel_pin[a], &Params.reg_dev.channels[a], time_diff, a);
-				iterate_relaybutton(&channel_pin[a], &Params.reg_dev.channels[a], time_diff, a); 
-				
-			}
-			last_iterate_time = millis();
-		}		
+	if ( !Params.cb.svr_connected() ) {		
 		
 		status(STATUS_DISCONNECTED, "Not connected");
 	    registered = 0;
