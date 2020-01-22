@@ -1508,18 +1508,19 @@ void SuplaDeviceClass::iterate(void) {
 	
 	if ( !isInitialized(false) ) return;
 
-	if ( !Params.cb.svr_connected() ) {	
-		if ( time_diff > 0 ) {
-			for(a=0;a<Params.reg_dev.channel_count;a++) {
-				iterate_relay(&channel_pin[a], &Params.reg_dev.channels[a], time_diff, a); // jest potrzebne do odliczenia czasu iteracji https://forum.supla.org/viewtopic.php?p=48745#p48745
-				iterate_sensor(&channel_pin[a], &Params.reg_dev.channels[a], time_diff, a);
-				iterate_thermometer(&channel_pin[a], &Params.reg_dev.channels[a], time_diff, a);
-				iterate_relaybutton(&channel_pin[a], &Params.reg_dev.channels[a], time_diff, a); 
-			
-			}
-			last_iterate_time = millis();
-		}
-	}
+    if ( time_diff > 0 ) {
+            
+        for(a=0;a<Params.reg_dev.channel_count;a++) {
+                
+            iterate_relay(&channel_pin[a], &Params.reg_dev.channels[a], time_diff, a);
+            iterate_sensor(&channel_pin[a], &Params.reg_dev.channels[a], time_diff, a);
+            iterate_thermometer(&channel_pin[a], &Params.reg_dev.channels[a], time_diff, a);
+			iterate_relaybutton(&channel_pin[a], &Params.reg_dev.channels[a], time_diff, a);
+                
+        }
+           
+        last_iterate_time = millis();
+    }
 	
     if ( wait_for_iterate != 0
          && _millis < wait_for_iterate ) {
@@ -1576,19 +1577,6 @@ void SuplaDeviceClass::iterate(void) {
 			srpc_dcs_async_ping_server(srpc);
 		}
         
-        if ( time_diff > 0 ) {
-            
-            for(a=0;a<Params.reg_dev.channel_count;a++) {
-                
-                iterate_relay(&channel_pin[a], &Params.reg_dev.channels[a], time_diff, a);
-                iterate_sensor(&channel_pin[a], &Params.reg_dev.channels[a], time_diff, a);
-                iterate_thermometer(&channel_pin[a], &Params.reg_dev.channels[a], time_diff, a);
-				iterate_relaybutton(&channel_pin[a], &Params.reg_dev.channels[a], time_diff, a);
-                
-            }
-            
-            last_iterate_time = millis();
-        }
 	}
 
 	if( srpc_iterate(srpc) == SUPLA_RESULT_FALSE ) {
