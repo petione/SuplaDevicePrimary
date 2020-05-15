@@ -18,7 +18,7 @@
 
 #include <Arduino.h>
 #include "IEEE754tools.h"
-#include "SuplaDevice.h"
+#include "SuplaDevicePrimary.h"
 #include "srpc.h"
 #include "log.h"
 
