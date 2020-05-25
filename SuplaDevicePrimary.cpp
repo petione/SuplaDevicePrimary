@@ -1507,20 +1507,22 @@ void SuplaDeviceClass::iterate(void) {
     unsigned long time_diff = abs(_millis - last_iterate_time);
 	
 	if ( !isInitialized(false) ) return;
-
-    if ( time_diff > 0 ) {
-            
-        for(a=0;a<Params.reg_dev.channel_count;a++) {
-                
-            iterate_relay(&channel_pin[a], &Params.reg_dev.channels[a], time_diff, a);
-            iterate_sensor(&channel_pin[a], &Params.reg_dev.channels[a], time_diff, a);
-            iterate_thermometer(&channel_pin[a], &Params.reg_dev.channels[a], time_diff, a);
-			iterate_relaybutton(&channel_pin[a], &Params.reg_dev.channels[a], time_diff, a);
-                
-        }
-           
-        last_iterate_time = millis();
-    }
+	
+	if ( !Params.cb.svr_connected() ) {
+		if ( time_diff > 0 ) {
+				
+			for(a=0;a<Params.reg_dev.channel_count;a++) {
+					
+				iterate_relay(&channel_pin[a], &Params.reg_dev.channels[a], time_diff, a);
+				iterate_sensor(&channel_pin[a], &Params.reg_dev.channels[a], time_diff, a);
+				iterate_thermometer(&channel_pin[a], &Params.reg_dev.channels[a], time_diff, a);
+				iterate_relaybutton(&channel_pin[a], &Params.reg_dev.channels[a], time_diff, a);
+					
+			}
+			   
+			last_iterate_time = millis();
+		}
+	}
 	
     if ( wait_for_iterate != 0
          && _millis < wait_for_iterate ) {
@@ -1575,6 +1577,17 @@ void SuplaDeviceClass::iterate(void) {
                          || (_millis-last_sent)/1000 >= (server_activity_timeout-5) ) ) {
             last_ping_time = _millis;
 			srpc_dcs_async_ping_server(srpc);
+		}
+		if ( time_diff > 0 ) {
+            
+            for(a=0;a<Params.reg_dev.channel_count;a++) {
+                
+                iterate_relay(&channel_pin[a], &Params.reg_dev.channels[a], time_diff, a);
+                iterate_sensor(&channel_pin[a], &Params.reg_dev.channels[a], time_diff, a);
+                iterate_thermometer(&channel_pin[a], &Params.reg_dev.channels[a], time_diff, a);
+				iterate_relaybutton(&channel_pin[a], &Params.reg_dev.channels[a], time_diff, a);
+                
+            }
 		}
         
 	}
