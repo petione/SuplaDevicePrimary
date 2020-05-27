@@ -929,8 +929,8 @@ void SuplaDeviceClass::iterate_relaybutton(SuplaChannelPin *pin, TDS_SuplaDevice
 				 else {
 					uint8_t val = suplaDigitalRead(channel->Number, pin->pin1);
 					if (val == 0 || val == 1) {
-						channelSetValue(channel->Number, val == HIGH ? 1 : 0, 0);
-						//channelSetValue(channel->Number, val1 == HIGH ? 1 : 0, 0);
+						//channelSetValue(channel->Number, val == HIGH ? 1 : 0, 0);
+						channelValueChanged(channel->Number, val == HIGH ? 1 : 0);	
 						Serial.print("RESET channel->Number-"); Serial.print(channel->Number); Serial.print("=="); Serial.println(val);
 					}
 				}
