@@ -1582,14 +1582,15 @@ void SuplaDeviceClass::iterate(void) {
 		}
 		if ( time_diff > 0 ) {
             
-            for(a=0;a<Params.reg_dev.channel_count;a++) {
+            	for(a=0;a<Params.reg_dev.channel_count;a++) {
                 
                 iterate_relay(&channel_pin[a], &Params.reg_dev.channels[a], time_diff, a);
                 iterate_sensor(&channel_pin[a], &Params.reg_dev.channels[a], time_diff, a);
                 iterate_thermometer(&channel_pin[a], &Params.reg_dev.channels[a], time_diff, a);
-				iterate_relaybutton(&channel_pin[a], &Params.reg_dev.channels[a], time_diff, a);
+		iterate_relaybutton(&channel_pin[a], &Params.reg_dev.channels[a], time_diff, a);
                 
-            }
+            	}
+			last_iterate_time = millis();
 		}
         
 	}
